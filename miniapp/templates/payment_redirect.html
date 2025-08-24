@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Оплата</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+  <style>
+    .custom-font {
+      font-family: 'Anton', sans-serif;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body class="bg-[#111] text-white font-sans">
+
+  <div class="w-screen h-64 overflow-hidden">
+    <video autoplay muted loop playsinline class="w-full h-full object-cover">
+      <source src="/static/payment.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="max-w-md mx-auto p-4 text-center custom-font">
+    <h1 class="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">
+      Нажмите на кнопку ниже, чтобы перейти к оплате:
+    </h1>
+
+    <a href="{{ payment_url }}" target="_blank" class="inline-block bg-[#1F1F1F] hover:bg-[#2a2a2a] border border-red-700 py-3 px-6 rounded-xl transition">
+      <span class="text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">
+        Перейти к оплате
+      </span>
+    </a>
+
+    <p class="mt-6 text-sm text-gray-400">После успешной оплаты ссылка будет отправлена вам в Telegram.</p>
+    <p class="mt-2 text-xs text-gray-500">Если возникли трудности — <a href="https://t.me/BlackGateSupp" class="underline">@BlackGateSupp</a></p>
+
+    <a href="/" class="mt-6 inline-flex items-center justify-center gap-2 bg-red-900 hover:bg-red-800 text-white py-3 px-4 rounded-xl transition duration-200 no-underline w-full">
+      <span class="text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">Главное меню</span>
+    </a>
+  </div>
+</body>
+</html>

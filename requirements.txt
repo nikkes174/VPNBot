@@ -1,0 +1,11 @@
+aiogram
+environs
+redis
+betterlogging
+yookassa
+python-dotenv
+uvicorn
+fastapi
+gspread
+oauth2client
+jinja2

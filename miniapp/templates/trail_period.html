@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlackGate</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Шрифт Anton -->
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+  <style>
+    .custom-font {
+      font-family: 'Anton', sans-serif;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+
+<body class="bg-[#111] text-white font-sans">
+
+  <!-- Видеобаннер -->
+  <div class="w-screen h-64 overflow-hidden">
+    <video autoplay muted loop playsinline class="w-full h-full object-cover">
+      <source src="/static/try.mp4" type="video/mp4">
+      Ваш браузер не поддерживает видео.
+    </video>
+  </div>
+
+  <!-- Контент -->
+  <div class="max-w-md mx-auto p-4">
+
+    <!-- Alert -->
+    <div class="bg-[#1F1F1F] rounded-2xl p-4 mt-4">
+      <h2 class="text-sm border border-red-500 p-2 rounded-md font-serif font-semibold uppercase tracking-wide text-red-300 bg-[#111]">
+        После нажатия в течение 1 минуты в Telegram вам придёт ключ на пробное подключение. Следуйте инструкции.
+      </h2>
+    </div>
+
+    <!-- Кнопки -->
+    <div class="bg-[#1F1F1F] rounded-2xl p-4 mt-4 custom-font text-base font-semibold tracking-wide">
+      <div class="mt-4 space-y-3">
+
+        <!-- Пробный период -->
+        <div id="start-trial-btn" class="cursor-pointer w-full flex items-center justify-between bg-red-900 hover:bg-red-800 py-3 px-4 rounded-xl transition duration-200">
+          <span class="text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">
+            Получить ключ
+          </span>
+        </div>
+
+        <!-- Инструкция -->
+        <div onclick="location.href='https://telegra.ph/Instrukciya-po-podklyucheniyu-07-14'" class="cursor-pointer w-full flex items-center justify-between bg-red-900 hover:bg-red-800 py-3 px-4 rounded-xl transition duration-200">
+          <span class="text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">
+            Инструкция по подключению
+          </span>
+        </div>
+
+        <!-- Главное меню -->
+        <a href="/" class="w-full flex items-center justify-center bg-red-900 hover:bg-red-800 py-3 px-4 rounded-xl transition duration-200 no-underline">
+          <span class="text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">
+            Главное меню
+          </span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <p class="text-center text-xs text-gray-500 mt-6">@BlackGateGuard_bot</p>
+  </div>
+
+  <!-- Script -->
+  <script>
+  const tg = window.Telegram.WebApp;
+  const user_id = tg.initDataUnsafe?.user?.id;
+  const username = tg.initDataUnsafe?.user?.username || "unknown";
+
+  document.getElementById("start-trial-btn").addEventListener("click", () => {
+    window.location.href = `/api/create_trial?user_id=${user_id}&username=${username}`;
+  });
+</script>
+</body>
+</html>

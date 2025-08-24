@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "mimetic-science-460617-m9",
+  "private_key_id": "672fb5ac801bed06776337fd4e5b882cf96cf53a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCjy4d0uT6Ehxdp\nBQEYPsQnKm1++4H9CkVEEeWLxACqPHAOf8IfplS+oKa+5QaM82rAgZdRtVJ2snXA\nSWRdmMhw7GjGFXzCsF9XpITb49oEtpMrFaf2BbMKC7FD1NwUtMgbEpmFTJh6/6jc\nnbWUqTlrKt44fiWRKqIyJKfNSI2MmZEV/sPkr7ha9CiNYXHuCiLodoldsFVLYuV0\nypdGM+yNEH4ox0k2jyysQuzt+HBotjcTb4U9mEGyCZONibvQFfjjD6k5FAq1HIh1\n2J/hfxpg1T4DrrP2uzbpDGeUFN4gQxusRoizcVFhIrSsamRPmeiEhy+q5BhwliaN\numh+18uRAgMBAAECggEAAr08nq8aZIz9zzvOMOGb1ivXePAr1Fd/oQvLkvLMMAyi\nsxtf27ekYyu8niSmX2USu/Vu2mb14hZJ8dVIYGhVsc3CUs25MGhSr9yIfETrOHj1\nLRtHm82smNZpOIEuzQnY7tr4xknpouTzpfzdNIc/9pLY9Ijnh+32mHAUflJgS6Ge\n9VsfoFGEAkIHfJ5fGwMyVfhiPGvmP6sUOB2WKq5Jt0JKo0Op5QPfV9luWanAuDOL\nlMicDDxMRcFuM22DSiKNw6hFg+gvFDmcUdPxEclcTZW9O3ybFE17Ds8wM9EInSzk\nbb2zKSefxIg734WEGUfZ+0XBeJSyl+xJisL39q1KoQKBgQDchEUbsZJJeP42hWAt\nyFUvGyH8Pkx44g+eI2wPH+0vvnRTbOMIrzePXyeLGqkYa63ruTvsxmgLij/ru312\nBoE3F+ZXA2ghZ3vxebundHzPNjoveACn3hrfXKloZICfp2hyRJs8I3FoxrMoRHx/\nLJeAIvUEziEc9rG0xsXV2I6qmwKBgQC+JrpcprPHsdXFgBiwNB42zLHvCWb5edUs\naT1MSpuqsaURJO5CPR6JvulZoNVTy3PKV1qkagb7v66SIYfmkgbEFH8A4h8RYgVe\nH45HcC23ytRTZeDVsbjIiB/1JBQkutaMwrvn7Meifmf6thYosBnwD2nRjrUpHLkf\nx8U4kl8/QwKBgDlZXO+62qSpBtP/E+hUNXMux0Pmn9TAVfd2lt/IGdNU4MPhiZn0\nl6p9wLb4lAl51516aw9E+kImDkGsXRCY2HoPiSQQCsDFPQKr+hWuwdbR74fw2ZrO\ntIZqftRbbugWjZ9KIGUfgpsRMf7C8O3SFwSIEtjREuOJdOXi3AilbVUJAoGAIgE7\nAqatL+EVoaQuxhQL8zDYAS9lQugOv0pys9oDzJrIMjCwixfzBh8mC+k/PST9KApH\nI2/yn8K/rVJhw1IJ87bWn4nQlIM7AoISJ6RgCKY1IlTtyEloCjSNwoEZORhQlgud\nHvSxHtYMMkGt5MjZWpznB5rFuvxv/sby9hL3BZECgYAza9ZKhlHjz0mrJaxgcF0b\nCD4FCFuG8z3Q50vtMJI5LnNLWjOKkzPC/lIBu6wSXCNP51o2gK8VJ4MmhS9sig6g\nMD2oopm2lV1w8csZh6cn0QMFibXxGNBVulpwQ/sgwehEwa/+yQVDzrcCY5vvvo3H\nj1g0+6pMona3R8aW/I2xyg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "sheets-bot@mimetic-science-460617-m9.iam.gserviceaccount.com",
+  "client_id": "114647391044935176037",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/sheets-bot%40mimetic-science-460617-m9.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

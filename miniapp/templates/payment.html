@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>BlackGate</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+  <style>
+    .custom-font {
+      font-family: 'Anton', sans-serif;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body class="bg-[#111] text-white font-sans">
+
+  <div class="w-screen h-64 overflow-hidden">
+    <video autoplay muted loop playsinline class="w-full h-full object-cover">
+      <source src="/static/payment.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="max-w-md mx-auto p-4">
+    <div class="bg-[#1F1F1F] rounded-2xl p-4 mt-4">
+      <h2 class="text-sm border border-red-500 p-2 rounded-md font-serif font-semibold uppercase tracking-wide text-red-300 bg-[#111]">
+        Выберите нужный период подписки. После оплаты, в течение минуты вам придёт ключ на подключение. Следуйте инструкции.
+      </h2>
+    </div>
+
+    <div class="bg-[#1F1F1F] rounded-2xl p-4 mt-4 custom-font text-base font-semibold tracking-wide">
+  <div class="mt-4 space-y-3">
+
+    <!-- SOLO -->
+    <a href="#" data-tariff="solo"
+       class="payment-button flex items-center justify-between bg-red-900 hover:bg-red-800 py-3 px-4 rounded-xl transition no-underline">
+      <span class="text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">
+        1 месяц / 120 рублей
+      </span>
+    </a>
+
+    <!-- LONG -->
+    <a href="#" data-tariff="long"
+       class="payment-button flex items-center justify-between bg-red-900 hover:bg-red-800 py-3 px-4 rounded-xl transition no-underline">
+      <span class="text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">
+        6 месяцев / 500 рублей
+      </span>
+    </a>
+
+    <!-- PAIR -->
+    <a href="#" data-tariff="pair"
+       class="payment-button flex items-center justify-between bg-red-900 hover:bg-red-800 py-3 px-4 rounded-xl transition no-underline">
+      <span class="text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">
+        Парная подписка 1 месяц / 200 рублей
+      </span>
+    </a>
+
+    <a href="/" class="flex items-center justify-center bg-red-900 hover:bg-red-800 py-3 px-4 rounded-xl transition no-underline">
+      <span class="text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">
+        Главное меню
+      </span>
+    </a>
+  </div>
+</div>
+
+
+    <p class="text-center text-xs text-gray-500 mt-6">@BlackGateGuard_bot</p>
+  </div>
+
+  <script>
+  const tg = window.Telegram.WebApp;
+  const user = tg.initDataUnsafe?.user;
+
+  if (user?.id) {
+    const user_id = user.id;
+    const username = user.username || "noname";
+
+    document.querySelectorAll(".payment-button").forEach(el => {
+      const tariff = el.dataset.tariff;
+      el.href = `/payment_redirect?user_id=${user_id}&username=${username}&tariff=${tariff}`;
+    });
+  } else {
+    alert("⚠️ Открой страницу через Telegram WebApp — только там работает оплата.");
+  }
+</script>
+
+</body>
+</html>

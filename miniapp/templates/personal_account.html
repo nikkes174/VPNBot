@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlackGate</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#111] text-white font-sans">
+  <div class="w-screen h-64 overflow-hidden">
+    <video autoplay muted loop playsinline class="w-full h-full object-cover">
+      <source src="/static/index.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="max-w-md mx-auto p-4">
+    <div class="bg-[#1F1F1F] rounded-2xl p-4 mt-4">
+      <h2 class="text-2xl font-serif font-extrabold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">
+        ЛИЧНЫЙ КАБИНЕТ
+      </h2>
+
+      {% if end_date %}
+  <p class="mt-2 text-sm text-gray-400">
+    Подписка активна до: <span class="text-red-400">{{ end_date }}</span>
+  </p>
+
+{% else %}
+  <p class="mt-2 text-sm text-gray-500 italic">
+    Подписка не активирована.
+  </p>
+{% endif %}
+      {% if ref_count and ref_count|int > 0 %}
+  <p class="mt-2 text-sm text-green-400">
+    Приглашённые друзья: <span class="font-semibold">{{ ref_count }}</span>
+  </p>
+{% else %}
+  <p class="mt-2 text-sm text-gray-500 italic">
+    Вы ещё не пригласили ни одного друга.
+  </p>
+{% endif %}
+      {% if discount == 100 %}
+  <p class="mt-2 text-sm text-green-400">
+    У Вас бесплатное пользование навсегда!
+  </p>
+{% elif discount > 0 %}
+  <p class="mt-2 text-sm text-yellow-400">
+    Ваша скидка на все тарифы: <span class="font-semibold">{{ discount }}%</span>
+  </p>
+{% endif %}
+
+      <div class="mt-4 space-y-3 text-base font-semibold tracking-wide">
+
+  <div onclick="location.href='/trail'" class="cursor-pointer flex items-center justify-center bg-red-900 hover:bg-red-800 active:scale-95 active:shadow-inner transition-all duration-150 ease-in-out py-3 px-4 rounded-xl">
+    <span class="text-center text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">Пробный период</span>
+  </div>
+
+  <div onclick="location.href='/payment'" class="cursor-pointer flex items-center justify-center bg-red-900 hover:bg-red-800 active:scale-95 active:shadow-inner transition-all duration-150 ease-in-out py-3 px-4 rounded-xl">
+    <span class="text-center text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">Тарифы</span>
+  </div>
+
+  <div onclick="location.href='https://t.me/BlackGateSupp'" class="cursor-pointer flex items-center justify-center bg-red-900 hover:bg-red-800 active:scale-95 active:shadow-inner transition-all duration-150 ease-in-out py-3 px-4 rounded-xl">
+    <span class="text-center text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">Связь с менеджером</span>
+  </div>
+
+  <div onclick="location.href='https://t.me/BlackGateSupp'" class="cursor-pointer flex items-center justify-center bg-red-900 hover:bg-red-800 active:scale-95 active:shadow-inner transition-all duration-150 ease-in-out py-3 px-4 rounded-xl">
+    <span class="text-center text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">Система скидок</span>
+  </div>
+
+  <div onclick="location.href='https://telegra.ph/Instrukciya-po-podklyucheniyu-07-14'" class="cursor-pointer flex items-center justify-center bg-red-900 hover:bg-red-800 active:scale-95 active:shadow-inner transition-all duration-150 ease-in-out py-3 px-4 rounded-xl">
+    <span class="text-center text-transparent bg-clip-text bg-gradient-to-br from-red-600 to-red-300 drop-shadow-md">Инструкция по подключению</span>
+  </div>
+
+</div>
+
+
+        </div>
+      </div>
+    </div>
+    <p class="text-center text-xs text-gray-500 mt-6">🔥СНЕМИ СВОИ ОГРАНИЦЕНИЯ🔥</p>
+  </div>
+<script>
+  const tg = window.Telegram.WebApp;
+  const user_id = tg.initDataUnsafe?.user?.id;
+  if (user_id) {
+    const currentUrl = new URL(window.location.href);
+    if (!currentUrl.searchParams.get("user_id")) {
+      window.location.href = `/?user_id=${user_id}`;
+    }
+  }
+</script>
+</body>
+</html>

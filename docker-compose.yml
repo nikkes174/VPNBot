@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v2.11
+    command:
+      - "--configFile=/etc/traefik/traefik.yml"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "./traefik/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "./traefik/acme.json:/letsencrypt/acme.json"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  vpnapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vpnapp.rule=Host(`vpnpride.com`)"
+      - "traefik.http.routers.vpnapp.entrypoints=websecure"
+      - "traefik.http.routers.vpnapp.tls.certresolver=myresolver"
+    expose:
+      - "8000"
+    env_file:
+      - /home/vpnuser/vpnbot/.env
+
