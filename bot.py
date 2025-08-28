@@ -1,21 +1,24 @@
 import asyncio
 import logging
-import betterlogging as bl
 
-from aiogram.types import BotCommand, BotCommandScopeDefault, MenuButtonCommands
+import betterlogging as bl
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.storage.redis import RedisStorage, DefaultKeyBuilder
+from aiogram.fsm.storage.redis import DefaultKeyBuilder, RedisStorage
+from aiogram.types import (BotCommand, BotCommandScopeDefault,
+                           MenuButtonCommands)
 
-from tgbot.config import load_config, Config
+from tgbot.config import Config, load_config
 from tgbot.handlers import user_router
 from tgbot.middlewares.config import ConfigMiddleware
 from tgbot.services import broadcaster
 
 config = load_config(".env")
 
-bot = Bot(token=config.tg_bot.token, default=DefaultBotProperties(parse_mode='HTML'))
+bot = Bot(
+    token=config.tg_bot.token, default=DefaultBotProperties(parse_mode="HTML")
+)
 
 
 async def on_startup(bot: Bot, admin_ids: list[int]):
@@ -28,7 +31,9 @@ async def on_startup(bot: Bot, admin_ids: list[int]):
     await broadcaster.broadcast(bot, admin_ids, "Бот запущен")
 
 
-def register_global_middlewares(dp: Dispatcher, config: Config, session_pool=None):
+def register_global_middlewares(
+    dp: Dispatcher, config: Config, session_pool=None
+):
     middleware_types = [
         ConfigMiddleware(config),
     ]
@@ -42,7 +47,9 @@ def setup_logging():
     bl.basic_colorized_config(level=log_level)
     logging.basicConfig(
         level=logging.INFO,
-        format="%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s",
+        format="%(filename)s:%(lineno)d "
+               "#%(levelname)-8s "
+               "[%(asctime)s] - %(name)s - %(message)s",
     )
     logger = logging.getLogger(__name__)
     logger.info("Starting bot")

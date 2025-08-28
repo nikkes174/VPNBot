@@ -14,8 +14,11 @@ class DbConfig:
     port: int = 5432
 
     # For SQLAlchemy
-    def construct_sqlalchemy_url(self, driver="asyncpg", host=None, port=None) -> str:
+    def construct_sqlalchemy_url(
+        self, driver="asyncpg", host=None, port=None
+    ) -> str:
         from sqlalchemy.engine.url import URL
+
         if not host:
             host = self.host
         if not port:
@@ -38,8 +41,14 @@ class DbConfig:
         database = env.str("POSTGRES_DB")
         port = env.int("DB_PORT", 5432)
         return DbConfig(
-            host=host, password=password, user=user, database=database, port=port
+            host=host,
+            password=password,
+            user=user,
+            database=database,
+            port=port,
         )
+
+
 @dataclass
 class TgBot:
     token: str

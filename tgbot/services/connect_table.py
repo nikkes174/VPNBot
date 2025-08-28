@@ -1,13 +1,14 @@
-import os
-import gspread
 import asyncio
 import logging
-from typing import Optional
+import os
 from datetime import datetime, timedelta
+from typing import Optional
 
+import gspread
 from aiogram import Bot
 from aiogram.exceptions import TelegramForbiddenError
 from oauth2client.service_account import ServiceAccountCredentials
+
 from tgbot.keyboards.inline import to_payment
 
 
@@ -25,7 +26,9 @@ class SubscriptionManager:
 
     def _connect_to_google_sheets(self):
         """Подключение к Google Sheets."""
-        creds = ServiceAccountCredentials.from_json_keyfile_name(self.json_path, self.scope)
+        creds = ServiceAccountCredentials.from_json_keyfile_name(
+            self.json_path, self.scope
+        )
         client = gspread.authorize(creds)
         return client.open_by_key(self.sheet_key).sheet1
 
@@ -53,8 +56,14 @@ class SubscriptionManager:
         except Exception:
             return None
 
-    def upsert_subscription(self, user_id: int, username: str, days: int = 30,
-                            client_uuid: str = "", referrer_id: int = None) -> None:
+    def upsert_subscription(
+        self,
+        user_id: int,
+        username: str,
+        days: int = 30,
+        client_uuid: str = "",
+        referrer_id: int = None,
+    ) -> None:
         """Создать или обновить подписку пользователя."""
         records = self._get_records()
         today = datetime.now().date()
@@ -70,15 +79,21 @@ class SubscriptionManager:
                     self.sheet.update_cell(row, 8, client_uuid)
                 return
 
-        self.sheet.append_row([
-            user_id,
-            username,
-            "", "", "", "", "",  # C–G
-            client_uuid,
-            "",
-            referrer_id,
-            0
-        ])
+        self.sheet.append_row(
+            [
+                user_id,
+                username,
+                "",
+                "",
+                "",
+                "",
+                "",  # C–G
+                client_uuid,
+                "",
+                referrer_id,
+                0,
+            ]
+        )
 
     def get_user_uuid(self, user_id: int) -> Optional[str]:
         """Возвращает UUID клиента по user_id."""
@@ -90,8 +105,14 @@ class SubscriptionManager:
                     return uuid_val.strip()
         return None
 
-    def upsert_trial(self, user_id: int, username: str, days: int = 3,
-                     client_uuid: str = "", referrer_id: int = None) -> bool:
+    def upsert_trial(
+        self,
+        user_id: int,
+        username: str,
+        days: int = 3,
+        client_uuid: str = "",
+        referrer_id: int = None,
+    ) -> bool:
         """Создать или обновить пробный период для пользователя."""
         records = self._get_records()
         today = datetime.now().date()
@@ -105,7 +126,10 @@ class SubscriptionManager:
                 if last_trial:
                     try:
                         last_trial_date = self.parse_date(last_trial)
-                        if last_trial_date and (today - last_trial_date).days < 180:
+                        if (
+                            last_trial_date
+                            and (today - last_trial_date).days < 180
+                        ):
                             return False
                     except Exception:
                         pass
@@ -116,15 +140,21 @@ class SubscriptionManager:
                     self.sheet.update_cell(row, 8, client_uuid)
                 return True
 
-        self.sheet.append_row([
-            user_id,
-            username,
-            "", "", "", "", "",  # C–G
-            client_uuid,
-            "",
-            referrer_id,
-            0
-        ])
+        self.sheet.append_row(
+            [
+                user_id,
+                username,
+                "",
+                "",
+                "",
+                "",
+                "",  # C–G
+                client_uuid,
+                "",
+                referrer_id,
+                0,
+            ]
+        )
         return True
 
     def increment_ref_count(self, referrer_id: int) -> None:
@@ -146,10 +176,12 @@ class SubscriptionManager:
         await bot.send_message(
             user_id,
             "Здравствуйте, сегодня заканчивается подписка на VPN🖤",
-            reply_markup=to_payment()
+            reply_markup=to_payment(),
         )
 
-    async def check_expiration_dates(self, bot: Bot, admin_id: int = None) -> None:
+    async def check_expiration_dates(
+        self, bot: Bot, admin_id: int = None
+    ) -> None:
         """Проверяет подписки и отправляет уведомления об окончании."""
         try:
             records = self._get_records()
@@ -165,9 +197,15 @@ class SubscriptionManager:
                 if end_date and self.parse_date(end_date) == today:
                     try:
                         await self.send_payment_notification(bot, int(user_id))
-                        logging.info("✅ Уведомление: окончание подписки — user %s", user_id)
+                        logging.info(
+                            "✅ Уведомление: окончание подписки — user %s",
+                            user_id,
+                        )
                     except TelegramForbiddenError:
-                        logging.warning("🚫 Бот заблокирован у пользователя %s (подписка)", user_id)
+                        logging.warning(
+                            "🚫 Бот заблокирован у пользователя %s (подписка)",
+                            user_id,
+                        )
 
                 trial_end = record.get("end_trial_period")
                 if trial_end and self.parse_date(trial_end) == today:
@@ -175,13 +213,22 @@ class SubscriptionManager:
                         await bot.send_message(
                             int(user_id),
                             "⚠️ Сегодня заканчивается пробный период. Чтобы продолжить пользоваться VPN, оплатите подписку.",
-                            reply_markup=to_payment()
+                            reply_markup=to_payment(),
                         )
                         if admin_id:
-                            await bot.send_message(admin_id, f"📛 У пользователя {user_id} заканчивается пробный период.")
-                        logging.info("✅ Уведомление: окончание триала — user %s", user_id)
+                            await bot.send_message(
+                                admin_id,
+                                f"📛 У пользователя {user_id} заканчивается пробный период.",
+                            )
+                        logging.info(
+                            "✅ Уведомление: окончание триала — user %s",
+                            user_id,
+                        )
                     except TelegramForbiddenError:
-                        logging.warning("🚫 Бот заблокирован у пользователя %s (триал)", user_id)
+                        logging.warning(
+                            "🚫 Бот заблокирован у пользователя %s (триал)",
+                            user_id,
+                        )
 
         except Exception as e:
             logging.exception("💥 Ошибка при проверке подписок: %s", e)

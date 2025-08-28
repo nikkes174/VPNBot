@@ -1,17 +1,18 @@
 import logging
 from datetime import datetime
 
-from aiogram import Router, Dispatcher, F, Bot, types
-from aiogram.filters import CommandStart, Command, CommandObject
-from aiogram.fsm.state import State, StatesGroup
-from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, FSInputFile, CallbackQuery
+from aiogram import Bot, Dispatcher, F, Router, types
 from aiogram.exceptions import TelegramAPIError, TelegramForbiddenError
+from aiogram.filters import Command, CommandObject, CommandStart
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.types import CallbackQuery, FSInputFile, Message
 from dotenv import load_dotenv
 
-from tgbot.services.connect_table import parse_date
-from tgbot.keyboards.inline import first_start_keyboard, admin_panel, to_payment
-from tgbot.services.connect_table import connect_to_google_sheets, schedule_daily_check
+from tgbot.keyboards.inline import (admin_panel, first_start_keyboard,
+                                    to_payment)
+from tgbot.services.connect_table import (connect_to_google_sheets, parse_date,
+                                          schedule_daily_check)
 
 load_dotenv()
 
@@ -22,6 +23,7 @@ dp = Dispatcher()
 
 class BroadcastStates(StatesGroup):
     waiting_for_message = State()
+
 
 class SendMessageStates(StatesGroup):
     waiting_for_user_id = State()
@@ -57,19 +59,9 @@ async def user_start(message: Message, command: CommandObject):
         if referrer_id and not records[user_row - 2].get("referrer_id"):
             sheet.update_cell(user_row, 6, referrer_id)
     else:
-        sheet.append_row([
-            user_id,
-            username,
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            referrer_id,
-            0
-        ])
+        sheet.append_row(
+            [user_id, username, "", "", "", "", "", "", "", referrer_id, 0]
+        )
     print(f"🌀 Новый запуск: user_id={user_id}, referrer_id={referrer_id}")
 
     video_path = "/root/vpnbot/TestNew/Files/1.mp4"
@@ -86,7 +78,7 @@ async def user_start(message: Message, command: CommandObject):
             " 😮  Никаких ручных включений — работает фоном 24/7\n"
             " ❗️ Неважно где вы — интернет всегда как дома"
         ),
-        reply_markup=first_start_keyboard()
+        reply_markup=first_start_keyboard(),
     )
 
 
@@ -96,7 +88,7 @@ async def admin_panel_handler(message: types.Message):
         await message.answer("У вас нет прав на использование этой команды.")
         return
     await message.answer(
-        f"Панель админа",
+        "Панель админа",
         reply_markup=admin_panel()
     )
 
@@ -111,7 +103,9 @@ async def send_all(call: types.CallbackQuery, state: FSMContext):
 
 
 @user_router.message(BroadcastStates.waiting_for_message)
-async def process_broadcast_message(message: types.Message, state: FSMContext, bot: Bot):
+async def process_broadcast_message(
+    message: types.Message, state: FSMContext, bot: Bot
+):
     text = message.text
     sheet = connect_to_google_sheets()
     users = sheet.get_all_records()
@@ -124,14 +118,16 @@ async def process_broadcast_message(message: types.Message, state: FSMContext, b
                 count += 1
             except TelegramAPIError as e:
                 print(f"❌ Не удалось отправить {user_id}: {e}")
-    await message.answer(f"✅ Рассылка завершена.")
+    await message.answer("✅ Рассылка завершена.")
     await state.clear()
 
 
 @user_router.callback_query(F.data == "to_check")
 async def o_daily_check(call: CallbackQuery, bot: Bot):
     await call.answer()  # Убираем "часики"
-    await call.message.answer("📅 Запуск планировщика для проверки подписок...")
+    await call.message.answer(
+        "📅 Запуск планировщика для проверки подписок..."
+    )
     schedule_daily_check(bot)
     await call.message.answer("✅ Проверка подписок была успешно запущена.")
 
@@ -140,8 +136,7 @@ async def o_daily_check(call: CallbackQuery, bot: Bot):
 async def send_message_to_user_handler(call: CallbackQuery, state: FSMContext):
     await call.answer()
     await call.message.answer(
-        "Введите ID пользователя,"
-        " которому хотите отправить сообщение:"
+        "Введите ID пользователя," " которому хотите отправить сообщение:"
     )
     await state.set_state(SendMessageStates.waiting_for_user_id)
 
@@ -159,12 +154,10 @@ async def process_user_id(message: types.Message, state: FSMContext):
 
 @user_router.message(SendMessageStates.waiting_for_message)
 async def process_message_text(
-        message: types.Message,
-        state: FSMContext,
-        bot: Bot
+    message: types.Message, state: FSMContext, bot: Bot
 ):
     user_data = await state.get_data()
-    user_id = user_data.get('user_id')
+    user_id = user_data.get("user_id")
     text = message.text
     try:
         await bot.send_message(user_id, text)
@@ -180,36 +173,35 @@ async def get_reff_link(call: CallbackQuery, bot: Bot):
     sheet = connect_to_google_sheets()
     records = sheet.get_all_records()
     user_record = next(
-        (r for r in records if str(r.get("user_id")) == str(user_id)),
-        None
+        (r for r in records if str(r.get("user_id")) == str(user_id)), None
     )
     if user_record:
         end_date_str = user_record.get("end_date")
         end_date = parse_date(end_date_str)
         if end_date and end_date >= datetime.today().date():
-            ref_link = f"https://t.me/mainfuckinghelper_bot?start=ref_{user_id}"
+            ref_link = (
+                f"https://t.me/mainfuckinghelper_bot?start=ref_{user_id}"
+            )
             await bot.send_message(
                 user_id,
                 f"🔗 Твоя реферальная ссылка:\n{ref_link}\n\n"
-                f"🧠 За каждую покупку по ссылке  +5 дней к твоей подписке!"
+                f"🧠 За каждую покупку по ссылке  +5 дней к твоей подписке!",
             )
         else:
             await bot.send_message(
                 user_id,
-                "⚠️ Реферальная ссылка доступна только при активной подписке.\n"
+                "⚠️ Реферальная ссылка доступна "
+                "только при активной подписке.\n",
             )
     else:
-        await bot.send_message(
-            user_id,
-            "😔 У вас нет активной подписки."
-        )
+        await bot.send_message(user_id, "😔 У вас нет активной подписки.")
 
 
 async def send_payment_notification(bot: Bot, user_id: int):
     await bot.send_message(
         user_id,
         "Здравствуйте, сегодня заканчивается подписка на VPN🖤",
-        reply_markup=to_payment()
+        reply_markup=to_payment(),
     )
 
 
@@ -219,7 +211,7 @@ async def check_expiration_dates(bot: Bot):
         records = sheet.get_all_records()
         today = datetime.today().date()
         logging.info(f"📅 Проверка подписок на {today}")
-        admin_id = 'ADMIN_ID'
+        admin_id = "ADMIN_ID"
         for record in records:
             user_id = record.get("user_id")
             if not user_id:
@@ -240,12 +232,13 @@ async def check_expiration_dates(bot: Bot):
                         "⚠️ Здравствуйте,сегодня заканчивается пробный период."
                         " Чтобы продолжить пользоваться VPN,"
                         " оплатите подписку.",
-                        reply_markup=to_payment()
+                        reply_markup=to_payment(),
                     )
                     await bot.send_message(
                         admin_id,
                         f"📛 У пользователя {user_id}"
-                        f" заканчивается пробный период.")
+                        f" заканчивается пробный период.",
+                    )
                     logging.info(f"✅ Уведомление: окончание  {user_id}")
                 except TelegramForbiddenError:
                     logging.warning(f"🚫 Бот заблокирован у {user_id}")

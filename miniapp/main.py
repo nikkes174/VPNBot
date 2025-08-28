@@ -1,25 +1,17 @@
-import sys
-import os
-import logging
 import asyncio
+import logging
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, Request, BackgroundTasks, HTTPException, Depends
+import uvicorn
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-import uvicorn
 
 from bot import bot
 from constants import TARIFFS
-from payment import (
-    check_payment_loop,
-    create_payment as create_tariff_payment,
-    get_discount_by_ref_count,
-)
-from tgbot.services.connect_table import upsert_trial_period, connect_to_google_sheets
 from vpn_utils import Connection
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -37,11 +29,16 @@ class TrialRequest(BaseModel):
     username: str
     key: int
 
+
 class VPNWebApp:
     def __init__(self):
         self.app = FastAPI(title="VPN Web Backend")
         self.templates = Jinja2Templates(directory=BASE_DIR / "templates")
-        self.app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+        self.app.mount(
+            "/static",
+            StaticFiles(directory=BASE_DIR / "static"),
+            name="static",
+        )
         self._add_routes()
 
     def _add_routes(self):
@@ -60,45 +57,65 @@ class VPNWebApp:
                         discount = get_discount_by_ref_count(ref_count)
                         break
 
-            return self.templates.TemplateResponse("personal_account.html", {
-                "request": request,
-                "end_date": end_date_str,
-                "ref_count": ref_count,
-                "discount": discount,
-            })
+            return self.templates.TemplateResponse(
+                "personal_account.html",
+                {
+                    "request": request,
+                    "end_date": end_date_str,
+                    "ref_count": ref_count,
+                    "discount": discount,
+                },
+            )
 
         @self.app.get("/trial", response_class=HTMLResponse)
         async def trial_page(request: Request):
             """Страница пробного периода"""
-            return self.templates.TemplateResponse("trail_period.html", {"request": request})
+            return self.templates.TemplateResponse(
+                "trail_period.html", {"request": request}
+            )
 
         @self.app.get("/payment", response_class=HTMLResponse)
         async def payment_page(request: Request):
             """Страница оплаты."""
-            return self.templates.TemplateResponse("payment.html", {"request": request})
+            return self.templates.TemplateResponse(
+                "payment.html", {"request": request}
+            )
 
         @self.app.get("/api/create_trial", response_class=HTMLResponse)
         async def create_trial(request: Request, user_id: int, username: str):
             """Создание триальной подписки."""
-            logging.info("Запрос на пробный период: user_id=%s, username=%s", user_id, username)
+            logging.info(
+                "Запрос на пробный период: user_id=%s, username=%s",
+                user_id,
+                username,
+            )
 
             x3 = Connection()
             result = x3.create_inbound(user_id=user_id, is_trial=True)
             if not result:
-                return self.templates.TemplateResponse("trail_link.html", {
-                    "request": request,
-                    "link": "❌ Не удалось создать подключение. Попробуйте позже."
-                })
+                return self.templates.TemplateResponse(
+                    "trail_link.html",
+                    {
+                        "request": request,
+                        "link": "❌ Не удалось создать подключение."
+                                " Попробуйте позже.",
+                    },
+                )
 
             uuid, port = result["uuid"], result["port"]
             ip = "82.117.243.199"
 
-            success = upsert_trial_period(user_id, username, days=3, client_uuid=uuid)
+            success = upsert_trial_period(
+                user_id, username, days=3, client_uuid=uuid
+            )
             if not success:
-                return self.templates.TemplateResponse("trail_link.html", {
-                    "request": request,
-                    "link": "⛔ Вы уже использовали пробный период."
-                })
+                return self.templates.TemplateResponse(
+                    "trail_link.html",
+                    {
+                        "request": request,
+                        "link": "⛔ Вы уже использовали пробный период.",
+                    },
+                )
 
             link = (
                 f"vless://{uuid}@{ip}:{port}?type=tcp&security=reality"
@@ -111,38 +128,58 @@ class VPNWebApp:
                 await bot.send_message(
                     user_id,
                     "Пробная подписка активирована!\n"
-                    f"🔗 Ваша ссылка на подключение (3 дня):\n\n<pre>{link}</pre>\n\n"
+                    f"🔗 Ваша ссылка на подключение (3 дня):"
+                    f"\n\n<pre>{link}</pre>\n\n"
                     "Если возникли трудности — @BlackGateSupp",
                     parse_mode="HTML",
                 )
-                logging.info("Ссылка отправлена в Telegram: user_id=%s", user_id)
+                logging.info(
+                    "Ссылка отправлена в Telegram: user_id=%s", user_id
+                )
             except Exception as e:
                 logging.error("Ошибка отправки в Telegram: %s", e)
 
-            return self.templates.TemplateResponse("trail_link.html", {
-                "request": request,
-                "link": "Ссылка отправлена вам в Telegram."
-            })
+            return self.templates.TemplateResponse(
+                "trail_link.html",
+                {
+                    "request": request,
+                    "link": "Ссылка отправлена вам в Telegram.",
+                },
+            )
 
         @self.app.post("/create_payment", response_class=HTMLResponse)
-        async def create_payment(request: Request, data: TrialRequest, background_tasks: BackgroundTasks):
+        async def create_payment(
+            request: Request,
+            data: TrialRequest,
+            background_tasks: BackgroundTasks,
+        ):
             """Создание платежа."""
             tariff_map = {1: "solo", 2: "long", 3: "pair"}
             tariff = tariff_map.get(data.key)
             if not tariff:
-                raise HTTPException(status_code=400, detail="❌ Неверный ключ тарифа")
+                raise HTTPException(
+                    status_code=400, detail="❌ Неверный ключ тарифа"
+                )
 
             days = TARIFFS[tariff]["days"]
-            payment_id, payment_url = create_tariff_payment(user_id=data.user_id, tariff=tariff)
+            payment_id, payment_url = create_tariff_payment(
+                user_id=data.user_id, tariff=tariff
+            )
             if not payment_id:
-                raise HTTPException(status_code=500, detail="❌ Ошибка создания платежа")
+                raise HTTPException(
+                    status_code=500, detail="❌ Ошибка создания платежа"
+                )
 
-            asyncio.create_task(check_payment_loop(payment_id, data.user_id, data.username, bot, days))
+            asyncio.create_task(
+                check_payment_loop(
+                    payment_id, data.user_id, data.username, bot, days
+                )
+            )
 
-            return self.templates.TemplateResponse("payment_redirect.html", {
-                "request": request,
-                "payment_url": payment_url
-            })
+            return self.templates.TemplateResponse(
+                "payment_redirect.html",
+                {"request": request, "payment_url": payment_url},
+            )
 
         @self.app.get("/payment_redirect", response_class=HTMLResponse)
         async def payment_redirect(request: Request):
@@ -161,18 +198,30 @@ class VPNWebApp:
                 days = TARIFFS[tariff]["days"]
 
             except Exception:
-                raise HTTPException(status_code=400, detail="❌ Missing or invalid parameters")
+                raise HTTPException(
+                    status_code=400, detail="❌ Missing or invalid parameters"
+                )
 
             try:
-                payment_id, payment_url = create_tariff_payment(user_id=user_id, tariff=tariff)
-                asyncio.create_task(check_payment_loop(payment_id, user_id, username, bot, days))
+                payment_id, payment_url = create_tariff_payment(
+                    user_id=user_id, tariff=tariff
+                )
+                asyncio.create_task(
+                    check_payment_loop(
+                        payment_id, user_id, username, bot, days
+                    )
+                )
             except Exception as e:
-                raise HTTPException(status_code=500, detail=f"❌ Ошибка создания платежа: {str(e)}")
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"❌ Ошибка создания платежа: {str(e)}",
+                )
 
-            return self.templates.TemplateResponse("payment_redirect.html", {
-                "request": request,
-                "payment_url": payment_url
-            })
+            return self.templates.TemplateResponse(
+                "payment_redirect.html",
+                {"request": request, "payment_url": payment_url},
+            )
+
 
 app_instance = VPNWebApp()
 app = app_instance.app

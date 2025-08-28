@@ -2,8 +2,7 @@ import asyncio
 import logging
 from typing import Union
 
-from aiogram import Bot
-from aiogram import exceptions
+from aiogram import Bot, exceptions
 from aiogram.types import InlineKeyboardMarkup
 
 

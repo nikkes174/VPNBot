@@ -34,7 +34,7 @@
 project/
 │── bot/                 # Telegram-бот (Aiogram)
 │── tgbot/services/      # Работа с Google Sheets
-│── templates/           # HTML-шаблоны (личный кабинет, оплата, триал)
+│── templates/           # HTML-шаблоны (личный кабинет, оплата, пробный период)
 │── static/              # Видео и стили для веба
 │── vpn_utils.py         # Работа с Xray/X3-UI API
 │── payment.py           # Логика платежей и подписок
